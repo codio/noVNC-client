@@ -1,54 +1,54 @@
 import UI from './ui.js';
 let interval = setInterval(() => {
-  if (UI.rfb) {
-    clearInterval(interval);
-    interval = null;
-    listenClipboard();
-  }
+    if (UI.rfb) {
+        clearInterval(interval);
+        interval = null;
+        listenClipboard();
+    }
 }, 1000);
 
-const listenClipboard = function() {
-  const rfb = UI.rfb;
-  const clipboard = document.getElementById('clipboard');
+function listenClipboard() {
+    const rfb = UI.rfb;
+    const clipboard = document.getElementById('clipboard');
 
-  rfb.addEventListener('clipboard', function(e) {
-    clipboard.value = e.detail.text;
-  });
-
-  rfb.addEventListener('connect', function() {
-    const viewer = document.getElementsByTagName('canvas')[0];
-
-    document.body.addEventListener('paste', function(e) {
-      rfb.clipboardPasteFrom(e.clipboardData.getData('text'));
+    rfb.addEventListener('clipboard', (e) => {
+        clipboard.value = e.detail.text;
     });
 
-    document.body.addEventListener('keydown', function(e) {
-      if (e.keyCode !== 86) e.preventDefault();
-      setTimeout(function() {
-        viewer.dispatchEvent(new e.constructor(e.type, e));
-        rfb.focus();
-      }, 1);
-    });
+    rfb.addEventListener('connect', () => {
+        const viewer = document.getElementsByTagName('canvas')[0];
 
-    document.body.addEventListener('keyup', function(e) {
-      if (e.keyCode !== 86) e.preventDefault();
-      setTimeout(function() {
-        viewer.dispatchEvent(new e.constructor(e.type, e));
-        rfb.focus();
-      }, 1);
-    });
+        document.body.addEventListener('paste', (e) => {
+            rfb.clipboardPasteFrom(e.clipboardData.getData('text'));
+        });
 
-    viewer.addEventListener('keydown', function(e) {
-      if (e.ctrlKey) document.activeElement.blur();
-    });
+        document.body.addEventListener('keydown', (e) => {
+            if (e.keyCode !== 86) e.preventDefault();
+            setTimeout(() => {
+                viewer.dispatchEvent(new e.constructor(e.type, e));
+                rfb.focus();
+            }, 1);
+        });
 
-    viewer.addEventListener('keyup', function(e) {
-      if (e.ctrlKey && [67, 88].includes(e.keyCode)) {
-        clipboard.focus();
-        clipboard.select();
-        document.execCommand('copy');
-        rfb.focus();
-      }
+        document.body.addEventListener('keyup', (e) => {
+            if (e.keyCode !== 86) e.preventDefault();
+            setTimeout(() => {
+                viewer.dispatchEvent(new e.constructor(e.type, e));
+                rfb.focus();
+            }, 1);
+        });
+
+        viewer.addEventListener('keydown', (e) => {
+            if (e.ctrlKey) document.activeElement.blur();
+        });
+
+        viewer.addEventListener('keyup', (e) => {
+            if (e.ctrlKey && [67, 88].includes(e.keyCode)) {
+                clipboard.focus();
+                clipboard.select();
+                document.execCommand('copy');
+                rfb.focus();
+            }
+        });
     });
-  });
-};
+}
