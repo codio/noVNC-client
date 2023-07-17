@@ -49,7 +49,7 @@ uploadFile () {
   contentType=$2
   bucket=codio-assets
   resource="/${bucket}/${folder}/${tag}/${fName}"
-  dateValue="date -R"
+  dateValue=$(date -R)
   stringToSign="PUT\n\n${contentType}\n${dateValue}\n${resource}"
   signature="echo -en ${stringToSign} | openssl sha1 -hmac ${s3Secret} -binary | base64"
   curl -X PUT -T "${file}" \
