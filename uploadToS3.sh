@@ -11,7 +11,7 @@ replaceHtmlUrls () {
 }
 
 prepareHtml () {
-  cdn="\/\/global.codio.com\/${folder}\/${tag}"
+  cdn="\/\/static-assets.codio.com\/${folder}\/${tag}"
   replaceHtmlUrls "href=\"app\/" "href=\"${cdn}\/app\/"
   replaceHtmlUrls "src=\"app\/" "src=\"${cdn}\/app\/"
 }
@@ -47,7 +47,7 @@ uploadFile () {
   file=$1
   fName="${file#./}"
   contentType=$2
-  bucket="codio-global"
+  bucket="codio-assets"
   resource="/${bucket}/${folder}/${tag}/${fName}"
   dateValue=$(date -R)
   stringToSign="PUT\n\n${contentType}\n${dateValue}\n${resource}"
