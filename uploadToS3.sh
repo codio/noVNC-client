@@ -51,7 +51,7 @@ uploadFile () {
   resource="/${bucket}/${folder}/${tag}/${fName}"
   dateValue=$(date -R)
   stringToSign="PUT\n\n${contentType}\n${dateValue}\n${resource}"
-  signature="echo -en ${stringToSign} | openssl sha1 -hmac ${s3Secret} -binary | base64"
+  signature=$(echo -en "${stringToSign}" | openssl sha1 -hmac "${s3Secret}" -binary | base64)
   curl -X PUT -T "${file}" \
     -H "Host: ${bucket}.s3.amazonaws.com" \
     -H "Date: ${dateValue}" \
