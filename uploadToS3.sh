@@ -45,7 +45,7 @@ getContentType () {
 
 uploadFile () {
   file=$1
-  fName="${VAR1#./}"
+  fName="${file#./}"
   contentType=$2
   bucket=codio-assets
   resource="/${bucket}/${folder}/${tag}/${fName}"
@@ -57,7 +57,7 @@ uploadFile () {
     -H "Date: ${dateValue}" \
     -H "Content-Type: ${contentType}" \
     -H "Authorization: AWS ${s3Key}:${signature}" \
-    https://${bucket}.s3.amazonaws.com/"${folder}"/"${tag}"/"${fName}"
+    https://${bucket}.s3.amazonaws.com/"${folder}"/"${tag}"/"${fName}" || exit 1
 }
 
 prepareHtml
