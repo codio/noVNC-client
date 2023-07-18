@@ -961,6 +961,8 @@ export default class RFB extends EventTargetMixin {
     }
 
     _handleMessage() {
+        window.parent.postMessage(JSON.stringify({method: 'noVNCPing'}), '*')
+
         if (this._sock.rQwait("message", 1)) {
             Log.Warn("handleMessage called on an empty receive queue");
             return;
