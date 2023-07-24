@@ -955,7 +955,7 @@ const UI = {
             navigator.permissions.query({name: 'clipboard-write'})
                 .then(() => navigator.clipboard.writeText(text))
                 .then(() => {
-                    let debugMessage = text.substring(0, 40) + "...";
+                    const debugMessage = text.substring(0, 40) + "...";
                     Log.Debug('>> UI.setClipboardText: navigator.clipboard.writeText with ' + debugMessage);
                 })
                 .catch((err) => {
