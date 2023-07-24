@@ -276,7 +276,7 @@ export default class RFB extends EventTargetMixin {
         // All prepared, kick off the connection
         this._updateConnectionState('connecting');
 
-        this.oncanvasfocus = () => {}; // Handler for canvas focused
+        this.onCanvasFocus = () => {}; // Handler for canvas focused
 
         Log.Debug("<< RFB.constructor");
 
@@ -486,7 +486,7 @@ export default class RFB extends EventTargetMixin {
     }
 
     focus(options) {
-        this.oncanvasfocus();
+        this.onCanvasFocus();
         this._canvas.focus(options);
     }
 
