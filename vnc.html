@@ -48,11 +48,15 @@
       crossorigin="anonymous"
     ></script>
     <script>
+        const prodRe = /https:\/\/.+\.codio\.io$/
+        const prodUkRe = /https:\/\/.+\.codio-box\.uk$/
+        const isProd = prodRe.test(location.origin) || prodUkRe.test(location.origin)
         Sentry.onLoad(function() {
             Sentry.init({
                 // No need to configure DSN here, it is already configured in the loader script
                 // You can add any additional configuration here
-                release: 'TAG_VERSION'
+                release: 'TAG_VERSION',
+                environment: isProd ? 'production' : 'development'
             });
         });
     </script>
