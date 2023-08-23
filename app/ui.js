@@ -1011,7 +1011,6 @@ const UI = {
         } else {
             UI.openClipboardPanel();
         }
-        testUndefinedFunc()
     },
 
     clipboardReceive(e) {
