@@ -33,6 +33,9 @@ function safeJoin(input, delimiter) {
 }
 
 const defaultErrorFunc = (...args) => {
+    if (!Sentry) {
+        return;
+    }
     const extra = {arguments: args};
     if (args[0] instanceof Error) {
         Sentry.captureException(args[0], {extra});
