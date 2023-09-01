@@ -10,12 +10,42 @@
  * Logging/debug routines
  */
 
+
+/* global Sentry */
+
 let _logLevel = 'warn';
+
+function safeJoin(input, delimiter) {
+    if (!Array.isArray(input)) {
+        return '';
+    }
+    const output = [];
+    // eslint-disable-next-line
+    for (let i = 0; i < input.length; i++) {
+        const value = input[i];
+        try {
+            output.push(String(value));
+        } catch (e) {
+            output.push('[value cannot be serialized]');
+        }
+    }
+    return output.join(delimiter);
+}
+
+const defaultErrorFunc = (...args) => {
+    const extra = {arguments: args};
+    if (args[0] instanceof Error) {
+        Sentry.captureException(args[0], {extra});
+        return;
+    }
+    let message = safeJoin(args, ' ');
+    Sentry.captureMessage(message);
+};
 
 let Debug = () => {};
 let Info = () => {};
 let Warn = () => {};
-let Error = () => {};
+let Error = defaultErrorFunc;
 
 export function initLogging(level) {
     if (typeof level === 'undefined') {
@@ -24,7 +54,8 @@ export function initLogging(level) {
         _logLevel = level;
     }
 
-    Debug = Info = Warn = Error = () => {};
+    Debug = Info = Warn = () => {};
+    Error = defaultErrorFunc;
 
     if (typeof window.console !== "undefined") {
         /* eslint-disable no-console, no-fallthrough */
@@ -36,7 +67,10 @@ export function initLogging(level) {
             case 'warn':
                 Warn  = console.warn.bind(window.console);
             case 'error':
-                Error = console.error.bind(window.console);
+                Error = (...args) => {
+                    console.error(...args);
+                    defaultErrorFunc(...args);
+                };
             case 'none':
                 break;
             default:
