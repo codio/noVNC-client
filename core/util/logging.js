@@ -11,8 +11,6 @@
  */
 
 
-/* global Sentry */
-
 let _logLevel = 'warn';
 
 function safeJoin(input, delimiter) {
