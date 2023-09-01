@@ -7,6 +7,17 @@ import { encodeUTF8, decodeUTF8 } from '../core/util/strings.js';
 describe('Utils', function () {
     "use strict";
 
+    const realSentry = window.Sentry;
+
+    before(function () {
+        window.Sentry = {
+            captureException: () => {},
+            captureMessage: () => {}
+        };
+    });
+    after(function () {
+        window.Sentry = realSentry;
+    });
     describe('logging functions', function () {
         beforeEach(function () {
             sinon.spy(console, 'log');
