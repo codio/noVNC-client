@@ -33,16 +33,16 @@ function safeJoin(input, delimiter) {
 }
 
 const defaultErrorFunc = (...args) => {
-    if (!Sentry) {
+    if (!window.Sentry) {
         return;
     }
     const extra = {arguments: args};
     if (args[0] instanceof Error) {
-        Sentry.captureException(args[0], {extra});
+        window.Sentry.captureException(args[0], {extra});
         return;
     }
     let message = safeJoin(args, ' ');
-    Sentry.captureMessage(message);
+    window.Sentry.captureMessage(message);
 };
 
 let Debug = () => {};
