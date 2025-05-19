@@ -23,6 +23,7 @@ prepareSources () {
   replaceHtmlUrls "href=\"app\/" "href=\"${cdn}\/app\/"
   replaceHtmlUrls "src=\"app\/" "src=\"${cdn}\/app\/"
   replaceHtmlUrls "from \".\/app\/" "from \"${cdn}\/app\/"
+  replaceHtmlUrls "from '.\/core\/util\/" "from '${cdn}\/core\/util\/"
   replaceTagVersion
   replaceJsUrls
 }
