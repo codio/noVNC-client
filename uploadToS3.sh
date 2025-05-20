@@ -17,6 +17,7 @@ replaceTagVersion () {
 
 replaceJsUrls () {
   sed -i "s/\.\/package\.json/${cdn}\/package\.json/" "./app/ui.js"
+  sed -i "s/\"app\//\"${cdn}\/app\//" "./app/ui.js"
 }
 
 prepareSources () {
