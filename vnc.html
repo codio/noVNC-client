@@ -70,6 +70,7 @@
     <script type="module">
         import UI from "./app/ui.js";
         import * as Log from './core/util/logging.js';
+        import * as CodioUtils from "./app/codio-utils.js";
 
         let response;
 
@@ -112,6 +113,7 @@
         // mandatory['view_only'] = true;
 
         // See docs/EMBEDDING.md for a list of possible settings.
+        CodioUtils.overrideDefaults(defaults)
 
         UI.start({ settings: { defaults: defaults,
                                mandatory: mandatory } });
