@@ -18,7 +18,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v5.1.0
         with:
           aws-region: us-east-1
-          role-to-assume: arn:aws:iam::028537455170:role/Github/GithubAssetsUploadRole_jvm-oom-handler
+          role-to-assume: arn:aws:iam::028537455170:role/Github/GithubAssetsUploadRole_noVNC-client
           role-session-name: GithubAction
 
       - name: Upload to s3
