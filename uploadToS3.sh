@@ -28,7 +28,7 @@ prepareSources () {
   replaceJsUrls
 }
 
-readarray -d '' files < <(find ./ -type f -print0)
+readarray -d '' files < <(find ./ -type f -not -path "*/.git/*" -not -path "*/.github/*" -print0)
 
 getContentType () {
   filename=$1
