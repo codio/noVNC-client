@@ -1,5 +1,3 @@
-const expect = chai.expect;
-
 import Websock from '../core/websock.js';
 import FakeWebSocket from './fake.websocket.js';
 
@@ -46,6 +44,20 @@ describe('Websock', function () {
                                                      0x88, 0xee, 0x11, 0x33]));
                 expect(sock.rQshift32()).to.equal(0xabcd1234);
                 expect(sock.rQshift32()).to.equal(0x88ee1133);
+            });
+        });
+
+        describe('rQlen())', function () {
+            it('should return the number of buffered bytes in the receive queue', function () {
+                websock._receiveData(new Uint8Array([0xab, 0xcd, 0x12, 0x34,
+                                                     0x88, 0xee, 0x11, 0x33]));
+                expect(sock.rQlen()).to.equal(8);
+                sock.rQshift8();
+                expect(sock.rQlen()).to.equal(7);
+                sock.rQshift16();
+                expect(sock.rQlen()).to.equal(5);
+                sock.rQshift32();
+                expect(sock.rQlen()).to.equal(1);
             });
         });
 
@@ -263,20 +275,15 @@ describe('Websock', function () {
             });
             it('should implicitly split a large buffer', function () {
                 let str = '';
-                for (let i = 0;i <= bufferSize/5;i++) {
-                    str += '\x12\x34\x56\x78\x90';
+                let expected = [];
+                for (let i = 0;i < bufferSize * 3;i++) {
+                    let byte = Math.random() * 0xff;
+                    str += String.fromCharCode(byte);
+                    expected.push(byte);
                 }
 
                 sock.sQpushString(str);
-
-                let expected = [];
-                for (let i = 0;i < bufferSize/5;i++) {
-                    expected.push(0x12);
-                    expected.push(0x34);
-                    expected.push(0x56);
-                    expected.push(0x78);
-                    expected.push(0x90);
-                }
+                sock.flush();
 
                 expect(sock).to.have.sent(new Uint8Array(expected));
             });
@@ -310,24 +317,15 @@ describe('Websock', function () {
             });
             it('should implicitly split a large buffer', function () {
                 let buffer = [];
-                for (let i = 0;i <= bufferSize/5;i++) {
-                    buffer.push(0x12);
-                    buffer.push(0x34);
-                    buffer.push(0x56);
-                    buffer.push(0x78);
-                    buffer.push(0x90);
+                let expected = [];
+                for (let i = 0;i < bufferSize * 3;i++) {
+                    let byte = Math.random() * 0xff;
+                    buffer.push(byte);
+                    expected.push(byte);
                 }
 
                 sock.sQpushBytes(new Uint8Array(buffer));
-
-                let expected = [];
-                for (let i = 0;i < bufferSize/5;i++) {
-                    expected.push(0x12);
-                    expected.push(0x34);
-                    expected.push(0x56);
-                    expected.push(0x78);
-                    expected.push(0x90);
-                }
+                sock.flush();
 
                 expect(sock).to.have.sent(new Uint8Array(expected));
             });
@@ -551,7 +549,7 @@ describe('Websock', function () {
         });
     });
 
-    describe('WebSocket Receiving', function () {
+    describe('WebSocket receiving', function () {
         let sock;
         beforeEach(function () {
             sock = new Websock();

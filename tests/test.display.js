@@ -1,9 +1,7 @@
-const expect = chai.expect;
-
 import Base64 from '../core/base64.js';
 import Display from '../core/display.js';
 
-describe('Display/Canvas Helper', function () {
+describe('Display/Canvas helper', function () {
     const checkedData = new Uint8ClampedArray([
         0x00, 0x00, 0xff, 255, 0x00, 0x00, 0xff, 255, 0x00, 0xff, 0x00, 255, 0x00, 0xff, 0x00, 255,
         0x00, 0x00, 0xff, 255, 0x00, 0x00, 0xff, 255, 0x00, 0xff, 0x00, 255, 0x00, 0xff, 0x00, 255,
@@ -386,10 +384,11 @@ describe('Display/Canvas Helper', function () {
         });
 
         it('should draw an image from an image object on type "img" (if complete)', function () {
+            const img = { complete: true };
             display.drawImage = sinon.spy();
-            display._renderQPush({ type: 'img', x: 3, y: 4, img: { complete: true } });
+            display._renderQPush({ type: 'img', x: 3, y: 4, img: img });
             expect(display.drawImage).to.have.been.calledOnce;
-            expect(display.drawImage).to.have.been.calledWith({ complete: true }, 3, 4);
+            expect(display.drawImage).to.have.been.calledWith(img, 3, 4);
         });
     });
 });

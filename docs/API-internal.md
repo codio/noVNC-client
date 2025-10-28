@@ -1,4 +1,4 @@
-# 1. Internal Modules
+# 1. Internal modules
 
 The noVNC client is composed of several internal modules that handle
 rendering, input, networking, etc. Each of the modules is designed to
@@ -9,7 +9,7 @@ stable, and this documentation is not maintained as well as the
 official external API.
 
 
-## 1.1 Module List
+## 1.1 Module list
 
 * __Keyboard__ (core/input/keyboard.js): Keyboard input event handler with
 non-US keyboard support. Translates keyDown and keyUp events to X11
@@ -18,6 +18,8 @@ keysym values.
 * __Display__ (core/display.js): Efficient 2D rendering abstraction
 layered on the HTML5 canvas element.
 
+* __Clipboard__ (core/clipboard.js): Clipboard event handler.
+
 * __Websock__ (core/websock.js): Websock client from websockify
 with transparent binary data support.
 [Websock API](https://github.com/novnc/websockify-js/wiki/websock.js) wiki page.
@@ -25,16 +27,16 @@ with transparent binary data support.
 
 ## 1.2 Callbacks
 
-For the Mouse, Keyboard and Display objects the callback functions are
-assigned to configuration attributes, just as for the RFB object. The
-WebSock module has a method named 'on' that takes two parameters: the
-callback event name, and the callback function.
+For the Mouse, Keyboard, Display, and Clipboard objects, the callback
+functions are assigned to configuration attributes, just as for the RFB
+object. The WebSock module has a method named 'on' that takes two
+parameters: the callback event name, and the callback function.
 
 ## 2. Modules
 
-## 2.1 Keyboard Module
+## 2.1 Keyboard module
 
-### 2.1.1 Configuration Attributes
+### 2.1.1 Configuration attributes
 
 None
 
@@ -52,9 +54,9 @@ None
 | onkeypress | (keysym, code, down) | Handler for key press/release
 
 
-## 2.2 Display Module
+## 2.2 Display module
 
-### 2.2.1 Configuration Attributes
+### 2.2.1 Configuration attributes
 
 | name         | type  | mode | default | description
 | ------------ | ----- | ---- | ------- | ------------
@@ -81,3 +83,23 @@ None
 | blitImage          | (x, y, width, height, arr, offset, from_queue)          | Blit pixels (of R,G,B,A) to the display
 | drawImage          | (img, x, y)                                             | Draw image and track damage
 | autoscale          | (containerWidth, containerHeight)                       | Scale the display
+
+## 2.3 Clipboard module
+
+### 2.3.1 Configuration attributes
+
+None
+
+### 2.3.2 Methods
+
+| name               | parameters        | description
+| ------------------ | ----------------- | ------------
+| writeClipboard     | (text)            | An async write text to clipboard
+| grab               | ()                | Begin capturing clipboard events
+| ungrab             | ()                | Stop capturing clipboard events
+
+### 2.3.3 Callbacks
+
+| name    | parameters | description
+| ------- | ---------- | ------------
+| onpaste | (text)     | Called following a target focus event and an async clipboard read
