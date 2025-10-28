@@ -1,9 +1,7 @@
 #!/bin/bash
 set -xe
 
-s3Key=$1
-s3Secret=$2
-tag=$3
+tag=$1
 folder="noVNC"
 cdn="\/\/static-assets.codio.com\/${folder}\/${tag}"
 
@@ -26,7 +24,7 @@ prepareSources () {
   replaceJsUrls
 }
 
-readarray -d '' files < <(find ./ -type f -print0)
+readarray -d '' files < <(find ./ -type f -not -path "*/.git/*" -not -path "*/.github/*" -print0)
 
 getContentType () {
   filename=$1
@@ -58,16 +56,9 @@ uploadFile () {
   fName="${file#./}"
   contentType=$2
   bucket="codio-assets"
-  resource="/${bucket}/${folder}/${tag}/${fName}"
-  dateValue=$(date -R)
-  stringToSign="PUT\n\n${contentType}\n${dateValue}\n${resource}"
-  signature=$(echo -en "${stringToSign}" | openssl sha1 -hmac "${s3Secret}" -binary | base64)
-  curl -X PUT -T "${file}" \
-    -H "Host: ${bucket}.s3.amazonaws.com" \
-    -H "Date: ${dateValue}" \
-    -H "Content-Type: ${contentType}" \
-    -H "Authorization: AWS ${s3Key}:${signature}" \
-    https://${bucket}.s3.amazonaws.com/"${folder}"/"${tag}"/"${fName}" || exit 1
+  resource="s3://${bucket}/${folder}/${tag}/${fName}"
+
+  aws s3 cp "${file}" "${resource}" --cache-control no-cache --content-type "${contentType}"
 }
 
 prepareSources
