@@ -1,6 +1,6 @@
 export const overrideDefaults = (defaults) => {
     if (!defaults['autoconnect']) {
-      defaults['autoconnect'] = 'true'
+        defaults['autoconnect'] = 'true';
     }
     if (!defaults['host']) {
         defaults['host'] = window.location.hostname;
