@@ -89,11 +89,12 @@ Currently, the following options are available:
 
 * `compression` - The session compression level. Can be `0` to `9`.
 
-* `show_dot` - If a dot cursor should be shown when the remote server provides
-  no local cursor, or provides a fully-transparent (invisible) cursor.
-
 * `logging` - The console log level. Can be one of `error`, `warn`, `info` or
   `debug`.
+
+* `keep_device_awake` - Should we prevent the (local) display from going into
+  sleep mode while a connection is active? Useful for view-only sessions where
+  there unlikely to be any keyboard/mouse activity to keep the device active.
 
 ## HTTP serving considerations
 ### Browser cache issue
