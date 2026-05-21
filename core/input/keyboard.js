@@ -85,6 +85,7 @@ export default class Keyboard {
     }
 
     _handleKeyDown(e) {
+        Log.Debug("_handleKeyDown", e, this._target);
         const code = this._getKeyCode(e);
         let keysym = KeyboardUtil.getKeysym(e);
         let numlock = e.getModifierState('NumLock');
@@ -268,7 +269,7 @@ export default class Keyboard {
     // ===== PUBLIC METHODS =====
 
     grab() {
-        //Log.Debug(">> Keyboard.grab");
+        Log.Debug(">> Keyboard.grab", this._target);
 
         this._target.addEventListener('keydown', this._eventHandlers.keydown);
         this._target.addEventListener('keyup', this._eventHandlers.keyup);
@@ -276,11 +277,11 @@ export default class Keyboard {
         // Release (key up) if window loses focus
         window.addEventListener('blur', this._eventHandlers.blur);
 
-        //Log.Debug("<< Keyboard.grab");
+        Log.Debug("<< Keyboard.grab");
     }
 
     ungrab() {
-        //Log.Debug(">> Keyboard.ungrab");
+        Log.Debug(">> Keyboard.ungrab", this._target);
 
         this._target.removeEventListener('keydown', this._eventHandlers.keydown);
         this._target.removeEventListener('keyup', this._eventHandlers.keyup);
@@ -289,6 +290,6 @@ export default class Keyboard {
         // Release (key up) all keys that are in a down state
         this._allKeysUp();
 
-        //Log.Debug(">> Keyboard.ungrab");
+        Log.Debug(">> Keyboard.ungrab");
     }
 }
