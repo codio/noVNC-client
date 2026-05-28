@@ -46,36 +46,24 @@
     <link rel="preload" as="image" href="app/images/error.svg">
     <link rel="preload" as="image" href="app/images/warning.svg">
     <script
-      src="https://js.sentry-cdn.com/d08e273c89d12afcde41b3ec30d37ace.min.js"
-      crossorigin="anonymous"
+        src="https://browser.sentry-cdn.com/10.53.1/bundle.min.js"
+        integrity="sha384-jbb7+utXq5l+9udWjHUovKZyfWANLtC8QnVwrXU9YoCcldAlU6XJFdTHWdn2wFjk"
+        crossorigin="anonymous"
     ></script>
-    <script>
-        const prodRe = /https:\/\/.+\.codio\.io$/
-        const prodUkRe = /https:\/\/.+\.codio-box\.uk$/
-        const isProd = prodRe.test(location.origin) || prodUkRe.test(location.origin)
-        Sentry.onLoad(function() {
-            Sentry.init({
-                // No need to configure DSN here, it is already configured in the loader script
-                // You can add any additional configuration here
-                release: 'TAG_VERSION',
-                environment: isProd ? 'production' : 'development',
-                ignoreErrors: [
-                    'ResizeObserver loop completed with undelivered notifications' // https://bugzilla.mozilla.org/show_bug.cgi?id=1685038
-                ]
-            });
-        });
-    </script>
     <script type="module" crossorigin="anonymous" src="app/error-handler.js"></script>
 
     <script type="module">
         import UI from "./app/ui.js";
         import * as Log from './core/util/logging.js';
         import * as CodioUtils from './app/codio-utils.js';
+        import * as CodioSentry from './app/codio-sentry.js';
 
         let response;
 
         let defaults = {};
         let mandatory = {};
+
+        CodioSentry.init()
 
         // Default settings will be loaded from defaults.json. Mandatory
         // settings will be loaded from mandatory.json, which the user
@@ -314,6 +302,13 @@
                                     <input id="noVNC_setting_show_dot" type="checkbox"
                                            class="toggle">
                                     Show dot when no cursor
+                                </label>
+                            </li>
+                            <li>
+                                <label>
+                                    <input id="noVNC_setting_keep_device_awake" type="checkbox"
+                                            class="toggle">
+                                    Keep client display awake while connected
                                 </label>
                             </li>
                             <li><hr></li>

@@ -16,11 +16,12 @@ import KeyTable from "../core/input/keysym.js";
 import keysyms from "../core/input/keysymdef.js";
 import Keyboard from "../core/input/keyboard.js";
 import RFB from "../core/rfb.js";
+import WakeLockManager from './wakelock.js';
 import * as WebUtil from "./webutil.js";
 
 const PAGE_TITLE = "noVNC";
 
-const LINGUAS = ["cs", "de", "el", "es", "fr", "hr", "it", "ja", "ko", "nl", "pl", "pt_BR", "ru", "sv", "tr", "zh_CN", "zh_TW"];
+const LINGUAS = ["cs", "de", "el", "es", "fr", "hr", "hu", "it", "ja", "ko", "nl", "pl", "pt_BR", "ru", "sv", "tr", "uk", "zh_CN", "zh_TW"];
 
 const UI = {
 
@@ -46,6 +47,8 @@ const UI = {
     reconnectCallback: null,
     reconnectPassword: null,
     disconnectStatusTimeout: null,
+
+    wakeLockManager: new WakeLockManager(),
 
     async start(options={}) {
         UI.customSettings = options.settings || {};
@@ -136,11 +139,9 @@ const UI = {
 
         let autoconnect = UI.getSetting('autoconnect');
         if (autoconnect === 'true' || autoconnect == '1') {
-            autoconnect = true;
             UI.inhibitReconnect = false;
             UI.connect();
         } else {
-            autoconnect = false;
             // Show the connect panel on first load unless autoconnecting
             UI.openConnectPanel();
         }
@@ -191,6 +192,7 @@ const UI = {
         UI.initSetting('repeaterID', '');
         UI.initSetting('reconnect', true);
         UI.initSetting('reconnect_delay', 2000);
+        UI.initSetting('keep_device_awake', false);
     },
     // Adds a link to the label elements on the corresponding input elements
     setupSettingLabels() {
@@ -375,6 +377,8 @@ const UI = {
         UI.addSettingChangeHandler('view_only', UI.updateViewOnly);
         UI.addSettingChangeHandler('show_dot');
         UI.addSettingChangeHandler('show_dot', UI.updateShowDotCursor);
+        UI.addSettingChangeHandler('keep_device_awake');
+        UI.addSettingChangeHandler('keep_device_awake', UI.updateRequestWakelock);
         UI.addSettingChangeHandler('host');
         UI.addSettingChangeHandler('port');
         UI.addSettingChangeHandler('path');
@@ -1128,6 +1132,10 @@ const UI = {
             url.protocol = (window.location.protocol === "https:") ? 'wss:' : 'ws:';
         }
 
+        if (UI.getSetting('keep_device_awake')) {
+            UI.wakeLockManager.acquire();
+        }
+
         try {
             UI.rfb = new RFB(document.getElementById('noVNC_container'),
                              url.href,
@@ -1214,6 +1222,8 @@ const UI = {
         UI.showStatus(msg);
         UI.updateVisualState('connected');
 
+        UI.updateBeforeUnload();
+
         // Do this last because it can only be used on rendered elements
         UI.rfb.focus();
     },
@@ -1228,6 +1238,7 @@ const UI = {
         UI.connected = false;
 
         UI.rfb = undefined;
+        UI.wakeLockManager.release();
 
         if (!e.detail.clean) {
             UI.updateVisualState('disconnected');
@@ -1254,6 +1265,8 @@ const UI = {
             UI.showStatus(_("Disconnected"), 'normal');
         }
 
+        UI.updateBeforeUnload();
+
         document.title = PAGE_TITLE;
 
         UI.openControlbar();
@@ -1261,7 +1274,7 @@ const UI = {
     },
 
     securityFailed(e) {
-        let msg = "";
+        let msg;
         // On security failures we might get a string with a reason
         // directly from the server. Note that we can't control if
         // this string is translated or not.
@@ -1272,6 +1285,24 @@ const UI = {
             msg = _("New connection has been rejected");
         }
         UI.showStatus(msg, 'error');
+    },
+
+    handleBeforeUnload(e) {
+        // Trigger a "Leave site?" warning prompt before closing the
+        // page. Modern browsers (Oct 2025) accept either (or both)
+        // preventDefault() or a nonempty returnValue, though the latter is
+        // considered legacy. The custom string is ignored by modern browsers,
+        // which display a native message, but older browsers will show it.
+        e.preventDefault();
+        e.returnValue = _("Are you sure you want to disconnect the session?");
+    },
+
+    updateBeforeUnload() {
+        // Remove first to avoid adding duplicates
+        window.removeEventListener("beforeunload", UI.handleBeforeUnload);
+        if (!UI.rfb?.viewOnly && UI.connected) {
+            window.addEventListener("beforeunload", UI.handleBeforeUnload);
+        }
     },
 
 /* ------^-------
@@ -1800,6 +1831,8 @@ const UI = {
         if (!UI.rfb) return;
         UI.rfb.viewOnly = UI.getSetting('view_only');
 
+        UI.updateBeforeUnload();
+
         // Hide input related buttons in view only mode
         if (UI.rfb.viewOnly) {
             document.getElementById('noVNC_keyboard_button')
@@ -1857,6 +1890,16 @@ const UI = {
         // Display the desktop name in the document title
         document.title = e.detail.name + " - " + PAGE_TITLE;
     },
+
+    updateRequestWakelock() {
+        if (!UI.rfb) return;
+        if (UI.getSetting('keep_device_awake')) {
+            UI.wakeLockManager.acquire();
+        } else {
+            UI.wakeLockManager.release();
+        }
+    },
+
 
     bell(e) {
         if (UI.getSetting('bell') === 'on') {

@@ -10,7 +10,7 @@ replaceHtmlUrls () {
 }
 
 replaceTagVersion () {
-  sed -i "s/TAG_VERSION/${tag}/" "./vnc.html"
+  sed -i "s/TAG_VERSION/${tag}/" "./app/codio-sentry.js"
 }
 
 replaceJsUrls () {
