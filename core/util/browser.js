@@ -182,7 +182,12 @@ async function _checkWebCodecsH264DecodeSupport() {
 
     return true;
 }
-supportsWebCodecsH264Decode = await _checkWebCodecsH264DecodeSupport();
+
+// FIXME: Avoid top-level await due to a Chromium bug where Decoder.flush()
+// can hang indefinitely on some Android devices, blocking module evaluation.
+_checkWebCodecsH264DecodeSupport().then((result) => {
+    supportsWebCodecsH264Decode = result;
+});
 
 /*
  * The functions for detection of platforms and browsers below are exported
