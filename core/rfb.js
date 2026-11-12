@@ -270,6 +270,7 @@ export default class RFB extends EventTargetMixin {
 
         this._asyncClipboard = new AsyncClipboard(this._canvas);
         this._asyncClipboard.onpaste = this.clipboardPasteFrom.bind(this);
+        this._asyncClipboard.onwritefailed = this._dispatchClipboardEvent.bind(this);
 
         this._keyboard = new Keyboard(this._canvas);
         this._keyboard.onkeyevent = this._handleKeyEvent.bind(this);
@@ -2350,6 +2351,11 @@ export default class RFB extends EventTargetMixin {
         if (this._viewOnly) return;
         if (this._asyncClipboard.writeClipboard(text)) return;
         // Fallback clipboard
+        this._dispatchClipboardEvent(text);
+    }
+
+    _dispatchClipboardEvent(text) {
+        if (this._viewOnly) return;
         this.dispatchEvent(
             new CustomEvent("clipboard", {detail: {text: text}})
         );
