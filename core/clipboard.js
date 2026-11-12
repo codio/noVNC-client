@@ -20,6 +20,7 @@ export default class AsyncClipboard {
         // ===== EVENT HANDLERS =====
 
         this.onpaste = () => {};
+        this.onwritefailed = () => {};
     }
 
     // ===== PRIVATE METHODS =====
@@ -41,7 +42,11 @@ export default class AsyncClipboard {
             const text = await navigator.clipboard.readText();
             this.onpaste(text);
         } catch (error) {
-            Log.Error("Clipboard read failed: ", error);
+            if (error?.name === 'NotAllowedError') {
+                Log.Debug("Clipboard read not allowed: ", error);
+            } else {
+                Log.Error("Clipboard read failed: ", error);
+            }
         }
     }
 
@@ -51,7 +56,14 @@ export default class AsyncClipboard {
         // Can lazily check cached availability
         if (!this._isAvailable) return false;
         navigator.clipboard.writeText(text)
-            .catch(error => Log.Error("Clipboard write failed: ", error));
+            .catch((error) => {
+                if (error?.name === 'NotAllowedError') {
+                    Log.Debug("Clipboard write not allowed: ", error);
+                } else {
+                    Log.Error("Clipboard write failed: ", error);
+                }
+                this.onwritefailed(text);
+            });
         return true;
     }
 
