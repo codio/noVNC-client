@@ -62,7 +62,12 @@ uploadFile () {
   bucket="codio-assets"
   resource="s3://${bucket}/${folder}/${tag}/${fName}"
 
-  aws s3 cp "${file}" "${resource}" --cache-control no-cache --content-type "${contentType}"
+  cacheControl="public, max-age=31536000, immutable"
+  if [ "${contentType}" = "text/html" ]; then
+    cacheControl="no-cache"
+  fi
+
+  aws s3 cp "${file}" "${resource}" --cache-control "${cacheControl}" --content-type "${contentType}"
 }
 
 prepareSources
